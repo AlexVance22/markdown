@@ -1,0 +1,148 @@
+<html><head>
+<title>aandd5.md</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    background-color: #222;
+    margin: 0 auto 0;
+    font-family: arial;
+    font-size: 14pt;
+}
+#page {
+    background-color: #FFF;
+    width: 8.3in;
+    height: auto;
+    padding: 1in;
+}
+table {
+    border-spacing: 0;
+    border-collapse: separate;
+    border-radius: 5px;
+    border: 2px solid #BBB;
+    font-size: 14pt;
+}
+th {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+td {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+table th:not(:last-child), table td:not(:last-child) {
+    border-right: 2px solid #BBB;
+}
+table>thead>tr:not(:last-child)>th,
+table>thead>tr:not(:last-child)>td,
+table>tbody>tr:not(:last-child)>th,
+table>tbody>tr:not(:last-child)>td,
+table>tfoot>tr:not(:last-child)>th,
+table>tfoot>tr:not(:last-child)>td,
+table>tr:not(:last-child)>td,
+table>tr:not(:last-child)>th,
+table>thead:not(:last-child),
+table>tbody:not(:last-child),
+table>tfoot:not(:last-child) {
+    border-bottom: 2px solid #BBB;
+}
+</style>
+</head>
+<body>
+<div id="page">
+<h1>Algorithmen und Datenstrukturen</h1>
+<hr />
+<h3>5.1 Max-Heap operations</h3>
+<br /><br />
+<table>
+<tr>
+<th> Append              </th>
+<th> Bubble up          </th>
+</tr>
+<tr>
+<td> <img src="push1first.png" /> </td>
+<td> <img src="push1last.png" /> </td>
+</tr>
+<tr>
+<td> Append              </td>
+<td> Bubble up          </td>
+</tr>
+<tr>
+<td> <img src="push2first.png" /> </td>
+<td> <img src="push2last.png" /> </td>
+</tr>
+</table>
+<img src="push2final.png" />
+b)
+<br /><br />
+<table>
+<tr>
+<th> Replace with last   </th>
+<th> Bubble down        </th>
+</tr>
+<tr>
+<td> <img src="tree1first.png" /> </td>
+<td> <img src="tree1last.png" /> </td>
+</tr>
+<tr>
+<td> Replace with last   </td>
+<td> Bubble down        </td>
+</tr>
+<tr>
+<td> <img src="tree2first.png" /> </td>
+<td> <img src="tree2last.png" /> </td>
+</tr>
+</table>
+<img src="tree2final.png" />
+<h3>5.3 Quick(?)sort</h3>
+a)
+For the case of an array of length 1, $l=r=1$. Therefore the check on line 2 fails and the function exits immediately, giving us $T(1) = 0$.
+<br /><br />
+In the general case, we may assume the following formula the number of comparisons per call to Quicksort:
+$$
+\begin{align}
+T(l, r) &= r-l + T(k+1,r) + T(l,k-1) \\
+n &= r-l+1 \\
+T(n) = T(r-l+1) &= r-l + T(r-(k+1)+1) + T((k-1)-l+1)
+\end{align}
+$$
+Now we need to resolve some term for $k$. Since we are guaranteed a sorted input, we know that $p$ on line 9 must be the largest element in $A$. In lines 12 and 13, $i$ is incremented until either $i\geq r$ or $A[i]>p$. Since $A[i]$ can never be greater than $p$, the loop will terminate when $i=r$. $i$ will not be changed again in Partition, therefore $k=i=r$.
+$$
+\begin{align}
+T(n) &= (r-l) + T(r-r-1+1) + T(r-1-l+1) \\
+T(n) &= (r-l) + T(0) + T(r-1-l+1) \\
+T(n) &= (n-1) + T(0) + T(n-1-1+1) \\
+T(n) &= T(n-1) + (n-1) \\
+\end{align}
+$$
+b)
+$$
+\begin{align}
+T(1) &= 0 \\
+T(n) &= T(n-1) + (n-1) \\
+T(n) &= T(n-2) + (n-2) + (n-1) \\
+T(n) &= T(n-3) + (n-3) + (n-2) + (n-1)
+\end{align}
+$$
+From these equations it is possible to determine a finite sum formula for the recursive expression:
+$$
+\begin{align}
+\sum_{i=0}^{n}{(i-1)} =
+\sum_{i=0}^{n}{i} - \sum_{i=0}^{n}{1} =
+n\cdot\frac{(n+1)}{2}-n =
+\frac{n^2-n}{2} = \Theta(n^2)
+\end{align}
+$$
+<h3>5.4 Building a Heap</h3>
+We prove the invariant in the hint by mathematical induction on $t$.
+<br /><br />
+**Base Case $t =$ height$(T)$**: All nodes in the last level, i.e. the leaves, satisfy the heap condition since they have no children and if no children exist, they’re assigned the key $-\infty$ Thus, key$(P)\geq$ key$(C) = -\infty$ holds and the heap condition is satisfied.
+<br /><br />
+**Induction Hypothesis**: We assume that the invariant is true for $t = k$ for some $k\in\mathbb{N},0\leq k\leq$ height$(T)$, i.e. all nodes from levels height$(T)...k$ satisfy the heap condition key$(P)\geq$ key$(C)$ where $P$ is a parent node at level $l\geq k$, and $C$ is a child of $P$.
+<br /><br />
+**Inductive Step**: We must show that the invariant also holds for $t=k+1$. By the induction hypothesis the first $k$ levels satisfy the heap condition, i.e. level height$(T)...k$. We now consider level $k + 1$. In this level, we compare each node $N$ to their children nodes $C1$ and $C2$, which already satisfy the heap condition. In case node $N$ is greater than both its children, node $N$ satisfies the heap condition too. If $C1$ is greater than $C2$ and greater than $N$, we swap $N$ with $C1$. It could be that $N$ is smaller than $C1$’s children. We will "bubble down" $N$ by comparing it to its children until it has reached the correct position where the heap condition is satisfied. This happens analogously if $C2$ is greater than $C1$ and $N$. Now, the sub-tree of $N$ at level $k+1$ satisfies the heap condition and we move on the next node at level $k+1$ until we reach the last node at level $k+1$. At the end, all the nodes at level $k + 1$ satisfy the heap condition and we have shown that $I(k+1)$ holds. By the principle of mathematical induction, $I(t)$ is true for all $t\in\mathbb{N},0\leq t\leq$ height$(T)$. In particular, $I(0)$ holds, which means that after height$(T)$ iterations, all nodes form level 0, i.e. the root node, satisfy the heap condition, which show correctness of the function Heapify$(T)$.
+
+</div>
+</body>
+</html>

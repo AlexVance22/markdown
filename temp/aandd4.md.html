@@ -1,0 +1,146 @@
+<html><head>
+<title>aandd4.md</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    background-color: #222;
+    margin: 0 auto 0;
+}
+#page {
+    background-color: #FFF;
+    font-size: 15pt;
+    width: 8.3in;
+    height: auto;
+    padding: 1in;
+}
+</style>
+</head>
+<body>
+<div id="page">
+<h1>Algorithmen & Datenstrukturen</h1>
+<br />
+<h3>4.3 Formal proof of correctness for Insertion Sort</h3>
+$$
+\begin{flalign*}
+&\text{function insertionSort}(A) & \\
+&\hspace{0.8cm}\text{for }j\leftarrow 1,\dots,n\text{ do} \\
+&\hspace{1.6cm}\text{if }j>1\text{ then} \\
+&\hspace{2.4cm}\text{for }i\leftarrow j−1,\dots,1\text{ do} \\
+&\hspace{3.2cm}\text{if }A[i+1]<A[i]\text{ then} \\
+&\hspace{4.0cm}\text{Swap }A[i+1]\text{ and }A[i] \\
+\end{flalign*}
+$$
+**Hypothesis**: We assume that the invariant is true for $j = k$ for some $k\in\mathbb{N}$, $k<n$, i.e. after $k$ iterations, the first $k$ elements are sorted.
+
+**Base case**: We prove the statement for $j=1$. Since $j\not>1$, the algorithm doesn't execute the inner for-loop. According to $I(1)$, after the first iteration the first element is sorted, which holds because we only consider one element so it is sorted. Hence, $I(1)$ is shown.
+
+**Induction step**: We must show that the invariant also holds for $j=k+1$. By the induction hypothesis the first $k$ elements are sorted after $k$ steps, i.e. the positions $A[1\dots k]$. We now consider step $k+1$. In this iteration, we compare element $k+1$ with the previous, sorted $1\dots k$ elements, comparing $k+1$ to $k$, $k-1,\dots,1$ and whenever element $k+1$ is greater, we swap $k+1$ with the element it is currently being compared to until the element $k+1$ is no longer greater than the element to its left. From the induction hypothesis, we know that the first $k$ elements were sorted. If we now consider all the elements to the left of element $k+1$, we know that they are sorted since we didn't change anything there. We argue analogously for the elements to the right as they have simply shifted by one position but their order remains the same, sorted, leading to a sorted subarray $A[1\dots k+1]$. Thus, after $k+1$ iterations, the first $k+1$ elements are sorted and we have shown that $I(k+1)$ holds. By the principle of mathematical induction, $I(j)$ is true for all $j\in\mathbb{N}$. In particular, $I(n)$ holds, which means that after the first $n$ iterations the first $n$ elements, i.e. all the elements are sorted, which shows correctness of the Insertion Sort algorithm.
+
+<h3>4.4 Searching in a weirdly-sorted array</h3>
+a)
+```
+function find_k(A, n)
+    k <- n / 2
+	
+    if A[1] > A[k] then                       // search in left half if
+        return find_k(A[1..k], k)             // A[1] > A[k]
+	
+    else if A[k+1] > A[n] then                // search in right half
+        return find_k(A[k+1..n], n - k) + k   // if the A[k+1] > A[n]
+	
+    else                       // subarrays A[1...k] and A[k+1...n] sorted
+         return k              // in increasing order with A[1] > A[n]
+                               // so if A[k] > A[k+1], pivot found at A[k]
+```
+This divide and conquer algorithm first splits the array in half and checks which of the 2 subarrays remains weirdly sorted, before looking for $k$ in said subarray. If neither subarray is weirdly sorted, our chosen pivot must be the final $k$. The algorithm runs in $O(\log n)$ per Master theorem as the number of function calls $T(n) = T(n/2) + C$.
+b)
+```
+function find_l(A, n, l)
+    k <- find_k(A, n)
+    if l >= A[0] then
+        return binary_search(A[1..k], n, l)
+    else
+        return binary_search(A[k+1..n], n, l) + k
+```
+The search algorithm runs in $T(n) = 2\log n\leq O(\log n)$, first finding the pivot $k$ in $O(\log n)$ to split the two sorted subarrays, and then performing a binary search (also $O(\log n)$) to find $l$ in the appropriate subarray.
+
+<h3>4.5 Counting function calls in loops (cont’d)</h3>
+a)
+$$
+\begin{flalign*}
+&i\leftarrow 1 & \\
+&\text{while }i\leq n\text{ do} \\
+&\hspace{0.8cm}j\leftarrow 1 \\
+&\hspace{0.8cm}\text{while }\sqrt[i]{j}\leq n\text{ do} \\
+&\hspace{1.6cm}f() \\
+&\hspace{1.6cm}j\leftarrow j + 1 \\
+&\hspace{0.8cm}i\leftarrow i + 1 \\
+\end{flalign*}
+$$
+Since $\sqrt[i]{j}\leq n$ and $i,j,n\geq 0$, we can say that $j\leq n^i$, and receive the following for $T(n)$:
+$$
+\begin{align}
+T(n)=\sum_{i=1}^{n}{\sum_{j=1}^{n^i}{1}}
+= \sum_{i=1}^{n}{n^i}
+= \sum_{i=0}^{n}{n^i} - n^0
+= \frac{n^{n+1}-1}{n-1} - 1
+\end{align}
+$$
+We hypothesise that $T(n)=\Theta(n^n)$, and prove it by showing that their asymptotic growth is equivalent using limits.
+$$
+\begin{align}
+&\lim_{n\to\infty}{\frac{\frac{n^{n+1}-1}{n-1} - 1}{n^n}} =
+\lim_{n\to\infty}{\frac{n^{n+1}-1}{n^{n+1}-n^n}}-\frac{1}{n^n} =
+\lim_{n\to\infty}{\frac{n^{n+1}}{n^{n+1}-n^n}} -
+\lim_{n\to\infty}{\frac{1}{n^{n+1}-n^n}} - 0 = \\
+&\lim_{n\to\infty}{\frac{n}{n-1}} - 0 = 1
+\end{align}
+$$
+
+b)
+$$
+\begin{flalign*}
+&\text{function }A(n) & \\
+&\hspace{0.8cm}i\leftarrow 1 \\
+&\hspace{0.8cm}\text{while }i\leq n\text{ do} \\
+&\hspace{1.6cm}j\leftarrow i \\
+&\hspace{1.6cm}\text{while }j\leq n\text{ do} \\
+&\hspace{2.4cm}f() \\
+&\hspace{2.4cm}f() \\
+&\hspace{2.4cm}j\leftarrow j + 1 \\
+&\hspace{1.6cm}i\leftarrow i + 1 \\
+&\hspace{0.8cm}k\leftarrow n/2 \\
+&\hspace{0.8cm}\text{for }l=1\dots3\text{ do} \\
+&\hspace{1.6cm}\text{if }k > 0\text{ then} \\
+&\hspace{2.4cm}A(k)
+\end{flalign*}
+$$
+We divide the function into two parts: the constant portion up to '$i\leftarrow i + 1$' and the recursive portion from '$k\leftarrow n/2$' onwards. The constant portion is a simple series of sums:
+$$
+\begin{align}
+C(n)&=\sum_{i=1}^n{\sum_{j=i}^n{2}} = 
+\sum_{i=1}^n{(n-i+1)2} = 
+\sum_{i=1}^n{2n}-\sum_{i=1}^n{2i}+\sum_{i=1}^n{2} = 
+2n^2-2\frac{n\cdot(n+1)}{2}+2n \\
+&=2n^2-n^2+n = n^2+n
+\end{align}
+$$
+The recursive portion can be written as follows:
+$$
+R(n) = 3\cdot T(n/2)
+$$
+The function $A(n)$ therefore composes to the runtime
+$$
+\begin{align}
+T(n) &= R(n)+C(n) = 3\cdot T(n/2)+n^2+n \\
+T(n) &\leq 3\cdot T(n/2)+2n^2 \\
+T(n) &\geq 3\cdot T(n/2)+n^2 \\
+\end{align}
+$$
+Plugging into the Master theorem, we receive the coefficients $a=3$, $b=2$, $C_1=2$, $C_2=1$. Since $b>\log_2(a)$, we know that $T(n)\leq O(n^2)$, and $C$ having no real part to play we also know that $T(n)\geq\Omega(n^2)$. Therefore $T(n)=\Theta(n^2)$.
+
+</div>
+</body>
+</html>
